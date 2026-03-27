@@ -71,4 +71,39 @@ class AuthService {
     await _storage.delete(key: 'access_token');
     await _storage.delete(key: 'refresh_token');
   }
+
+  // 5. Get Bank List
+  Future<List<dynamic>> getBankList() async {
+    try {
+      final response = await _apiClient.get('/auth/bank-list');
+      if (response.data['success'] == true) {
+        return response.data['data'];
+      }
+      return [];
+    } on DioException catch (e) {
+      print('Fetch Bank List Failed: ${e.response?.data['message'] ?? e.message}');
+      return [];
+    }
+  }
+
+  // 6. Verify Bank Account
+  Future<Map<String, dynamic>?> verifyBank({
+    required String bankCode,
+    required String accountNumber,
+  }) async {
+    try {
+      final response = await _apiClient.post('/auth/verify-bank', data: {
+        'bank_code': bankCode,
+        'account_number': accountNumber,
+      });
+
+      if (response.data['success'] == true) {
+        return response.data['data'];
+      }
+      return null;
+    } on DioException catch (e) {
+      print('Bank Verification Failed: ${e.response?.data['message'] ?? e.message}');
+      return null;
+    }
+  }
 }
