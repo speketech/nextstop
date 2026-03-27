@@ -76,6 +76,7 @@ flutter:
   assets:
     - .env
     - assets/animations/
+    - assets/animations/success.json
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
