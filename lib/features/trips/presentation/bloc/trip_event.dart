@@ -44,3 +44,22 @@ class AcceptBid extends TripEvent {
   @override
   List<Object?> get props => [tripId, driverId, amount];
 }
+
+class ProcessPayment extends TripEvent {
+  final String rideId;
+  final String payerType;
+  final String customerName;
+  final String customerEmail;
+  final String customerId;
+
+  const ProcessPayment({
+    required this.rideId,
+    required this.payerType,
+    required this.customerName,
+    required this.customerEmail,
+    required this.customerId,
+  });
+
+  @override
+  List<Object?> get props => [rideId, payerType, customerName, customerEmail, customerId];
+}

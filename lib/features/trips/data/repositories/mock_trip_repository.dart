@@ -78,4 +78,15 @@ class MockTripRepository implements TripRepository {
     }
     throw Exception('Trip not found');
   }
+  @override
+  Future<void> processRidePayment({
+    required String rideId,
+    required String payerType,
+    required String customerName,
+    required String customerEmail,
+    required String customerId,
+  }) async {
+    await Future.delayed(const Duration(seconds: 2));
+    print('Mock: Payment processed for ride $rideId');
+  }
 }

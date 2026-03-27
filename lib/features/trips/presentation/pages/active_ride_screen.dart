@@ -4,8 +4,15 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:isw_mobile_sdk/isw_mobile_sdk.dart';
 import 'package:isw_mobile_sdk/models/isw_mobile_sdk_payment_info.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/app_colors.dart';
 import '../../../home/presentation/pages/route_channel_screen.dart';
+import '../bloc/trip_bloc.dart';
+import '../bloc/trip_event.dart';
+import '../bloc/trip_state.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../auth/presentation/bloc/auth_state.dart';
+
 
 class ActiveRideScreen extends StatefulWidget {
   const ActiveRideScreen({super.key});
@@ -49,65 +56,53 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
       );
       return;
     }
-    String customerId = "passenger_001";
-    String customerName = "Adesuwa Eze";
-    String customerEmail = "adesuwa@nextstop.com";
-    String customerMobile = "08123456789";
-    String reference = "NXT-${DateTime.now().millisecondsSinceEpoch}";
-    int amountInKobo = 2000 * 100; // ₦2000
 
-    IswPaymentInfo iswPaymentInfo = IswPaymentInfo(
-      customerId,
-      customerName,
-      customerEmail,
-      customerMobile,
-      reference,
-      amountInKobo,
-    );
+    final tripBloc = context.read<TripBloc>();
+    final authBloc = context.read<AuthBloc>();
+    final authState = authBloc.state;
 
-    try {
-      var result = await IswMobileSdk.pay(iswPaymentInfo);
-      
-      if (!mounted) return;
-
-      if (result.hasValue) {
-        if (result.value!.isSuccessful) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Payment Successful! Ref: ${result.value!.transactionReference}'),
-              backgroundColor: AppColors.accent,
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Payment Failed: ${result.value!.responseCode}'),
-              backgroundColor: AppColors.danger,
-            ),
-          );
-        }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Payment Cancelled.'),
-          ),
-        );
-      }
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: AppColors.danger,
-        ),
-      );
+    if (authState is AuthAuthenticated) {
+      tripBloc.add(ProcessPayment(
+        rideId: "ride_123", // Should be dynamic
+        payerType: "INITIATOR",
+        customerName: authState.user.fullName,
+        customerEmail: authState.user.email,
+        customerId: authState.user.id,
+      ));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
+    return BlocListener<TripBloc, TripState>(
+      listener: (context, state) {
+        if (state is TripLoading) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => const Center(child: CircularProgressIndicator()),
+          );
+        } else if (state is PaymentSuccess) {
+          Navigator.pop(context); // Close loading dialog
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Payment Verified! Let\'s go!'),
+              backgroundColor: AppColors.primary,
+            ),
+          );
+        } else if (state is TripError) {
+          Navigator.pop(context); // Close loading dialog
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Payment Error: ${state.message}'),
+              backgroundColor: AppColors.danger,
+            ),
+          );
+        }
+      },
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+
       appBar: AppBar(
         backgroundColor: AppColors.professionalWhite.withOpacity(0.9),
         elevation: 0,
@@ -123,12 +118,12 @@ class _ActiveRideScreenState extends State<ActiveRideScreen> {
               ),
             ),
             const SizedBox(height: 4),
-            SizedBox(
+            const SizedBox(
               width: 100,
               child: LinearProgressIndicator(
                 value: 0.6,
                 backgroundColor: AppColors.subtleGrey,
-                valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
                 minHeight: 4,
               ),
             ),

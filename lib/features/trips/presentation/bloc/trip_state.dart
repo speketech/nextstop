@@ -28,6 +28,8 @@ class TripError extends TripState {
   List<Object?> get props => [message];
 }
 
+class PaymentSuccess extends TripState {}
+
 class AvailableTripsLoaded extends TripState {
   final List<TripModel> trips;
   const AvailableTripsLoaded(this.trips);

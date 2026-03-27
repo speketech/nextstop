@@ -113,8 +113,8 @@ class _FareNegotiationScreenState extends State<FareNegotiationScreen> {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [AppColors.corporateSlate, const Color(0xFF3B5068)],
+                  gradient: const LinearGradient(
+                    colors: [AppColors.corporateSlate, Color(0xFF3B5068)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),

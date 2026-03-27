@@ -11,6 +11,23 @@ class TripBloc extends Bloc<TripEvent, TripState> {
     on<UpdateTripStatus>(_onUpdateTripStatus);
     on<PlaceBid>(_onPlaceBid);
     on<AcceptBid>(_onAcceptBid);
+    on<ProcessPayment>(_onProcessPayment);
+  }
+
+  Future<void> _onProcessPayment(ProcessPayment event, Emitter<TripState> emit) async {
+    emit(TripLoading());
+    try {
+      await tripRepository.processRidePayment(
+        rideId: event.rideId,
+        payerType: event.payerType,
+        customerName: event.customerName,
+        customerEmail: event.customerEmail,
+        customerId: event.customerId,
+      );
+      emit(PaymentSuccess());
+    } catch (e) {
+      emit(TripError(e.toString()));
+    }
   }
 
   Future<void> _onInitiateTrip(InitiateTrip event, Emitter<TripState> emit) async {

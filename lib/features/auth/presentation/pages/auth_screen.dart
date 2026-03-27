@@ -20,6 +20,11 @@ class _AuthScreenState extends State<AuthScreen> {
   late bool _isLogin;
   bool _obscurePassword = true;
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  String _selectedRole = 'passenger'; // DB stores lowercase
 
   @override
   void initState() {
@@ -30,18 +35,46 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   void dispose() {
     _emailController.dispose();
+    _passwordController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
   void _toggleAuthMode() => setState(() => _isLogin = !_isLogin);
 
   void _submit() {
-    if (_emailController.text.isNotEmpty) {
-      context.read<AuthBloc>().add(SendOtpRequested(_emailController.text));
+    if (_isLogin) {
+      if (_emailController.text.isNotEmpty && _passwordController.text.isNotEmpty) {
+        context.read<AuthBloc>().add(LoginRequested(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        ));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please enter email and password')),
+        );
+      }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter your email')),
-      );
+      if (_emailController.text.isNotEmpty &&
+          _passwordController.text.isNotEmpty &&
+          _firstNameController.text.isNotEmpty &&
+          _lastNameController.text.isNotEmpty &&
+          _phoneController.text.isNotEmpty) {
+        context.read<AuthBloc>().add(RegisterRequested(
+          firstName: _firstNameController.text.trim(),
+          lastName: _lastNameController.text.trim(),
+          email: _emailController.text.trim(),
+          phone: _phoneController.text.trim(),
+          password: _passwordController.text.trim(),
+          role: _selectedRole, // already lowercase
+        ));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please fill all fields')),
+        );
+      }
     }
   }
 
@@ -53,6 +86,8 @@ class _AuthScreenState extends State<AuthScreen> {
           Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => OtpVerificationScreen(emailOrPhone: state.emailOrPhone)),
           );
+        } else if (state is AuthAuthenticated) {
+          Navigator.pushReplacementNamed(context, '/dashboard');
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message), backgroundColor: AppColors.danger),
@@ -136,6 +171,37 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                   const SizedBox(height: 24),
 
+                  // First & Last Name fields (only for Sign Up)
+                  if (!_isLogin) ...[
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _firstNameController,
+                            style: GoogleFonts.roboto(color: AppColors.corporateSlate, fontSize: 16),
+                            decoration: InputDecoration(
+                              labelText: 'First Name',
+                              labelStyle: GoogleFonts.roboto(color: AppColors.textSubtleDark),
+                              prefixIcon: const Icon(Icons.person_outline, color: AppColors.textSubtleDark),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: TextField(
+                            controller: _lastNameController,
+                            style: GoogleFonts.roboto(color: AppColors.corporateSlate, fontSize: 16),
+                            decoration: InputDecoration(
+                              labelText: 'Last Name',
+                              labelStyle: GoogleFonts.roboto(color: AppColors.textSubtleDark),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+
                   // Email field
                   TextField(
                     controller: _emailController,
@@ -151,6 +217,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
                   if (!_isLogin) ...[
                     TextField(
+                      controller: _phoneController,
                       keyboardType: TextInputType.phone,
                       style: GoogleFonts.roboto(color: AppColors.corporateSlate, fontSize: 16),
                       decoration: InputDecoration(
@@ -160,9 +227,36 @@ class _AuthScreenState extends State<AuthScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
+
+                    // Role Selection — DB stores lowercase ('passenger' | 'driver')
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ChoiceChip(
+                            label: const Text('Passenger'),
+                            selected: _selectedRole == 'passenger',
+                            onSelected: (selected) {
+                              if (selected) setState(() => _selectedRole = 'passenger');
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: ChoiceChip(
+                            label: const Text('Driver'),
+                            selected: _selectedRole == 'driver',
+                            onSelected: (selected) {
+                              if (selected) setState(() => _selectedRole = 'driver');
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
                   ],
 
                   TextField(
+                    controller: _passwordController,
                     obscureText: _obscurePassword,
                     style: GoogleFonts.roboto(color: AppColors.corporateSlate, fontSize: 16),
                     decoration: InputDecoration(

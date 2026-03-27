@@ -32,3 +32,44 @@ class UpdateProfileRequested extends AuthEvent {
 }
 
 class LogoutRequested extends AuthEvent {}
+
+class RequestWhatsAppOtp extends AuthEvent {
+  final String phoneNumber;
+  const RequestWhatsAppOtp(this.phoneNumber);
+  @override
+  List<Object> get props => [phoneNumber];
+}
+
+class VerifyNinRequested extends AuthEvent {
+  final String nin;
+  const VerifyNinRequested(this.nin);
+  @override
+  List<Object> get props => [nin];
+}
+
+class LoginRequested extends AuthEvent {
+  final String email;
+  final String password;
+  const LoginRequested({required this.email, required this.password});
+  @override
+  List<Object> get props => [email, password];
+}
+
+class RegisterRequested extends AuthEvent {
+  final String firstName;
+  final String lastName;
+  final String email;
+  final String phone;
+  final String password;
+  final String role;
+  const RegisterRequested({
+    required this.firstName,
+    required this.lastName,
+    required this.email,
+    required this.phone,
+    required this.password,
+    required this.role,
+  });
+  @override
+  List<Object> get props => [firstName, lastName, email, phone, password, role];
+}
