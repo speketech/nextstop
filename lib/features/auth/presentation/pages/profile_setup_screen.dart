@@ -51,13 +51,17 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   void _submitProfile() {
     final state = context.read<AuthBloc>().state;
     if (state is AuthAuthenticated) {
+      final nameParts = _nameController.text.trim().split(' ');
+      final firstName = nameParts.isNotEmpty ? nameParts[0] : state.user.firstName;
+      final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : state.user.lastName;
+
       final updatedUser = UserModel(
         id: state.user.id,
         phone: state.user.phone,
-        fullName: _nameController.text.isNotEmpty ? _nameController.text : state.user.fullName,
+        firstName: firstName,
+        lastName: lastName,
         email: state.user.email,
         role: _isDriver ? UserRole.driver : UserRole.passenger,
-        isVerified: true,
         ninVerified: true,
       );
       context.read<AuthBloc>().add(UpdateProfileRequested(updatedUser));
@@ -68,7 +72,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
-        if (state is AuthAuthenticated && state.user.isVerified) {
+        if (state is AuthAuthenticated && state.user.ninVerified) {
           // If profile is "completed" (verified in our mock), go to home
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(

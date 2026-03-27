@@ -21,6 +21,7 @@ class ApiClient {
       },
     );
   }
+  
 
   ApiClient() {
     _dio = Dio(_baseOptions());

@@ -18,6 +18,7 @@ class TripModel {
   final String id;
   final String initiatorId;
   final String? driverId;
+  final String? vehicleId;
 
   // Schema: pickup_location_name / dropoff_location_name
   final String pickupLocationName;
@@ -41,6 +42,7 @@ class TripModel {
     required this.id,
     required this.initiatorId,
     this.driverId,
+    this.vehicleId,
     required this.pickupLocationName,
     this.pickupLat,
     this.pickupLng,
@@ -66,6 +68,7 @@ class TripModel {
       id: json['ride_id'] ?? json['id'] ?? '',
       initiatorId: json['initiator_id'] ?? '',
       driverId: json['driver_id'],
+      vehicleId: json['vehicle_id'],
       pickupLocationName: json['pickup_location_name'] ?? '',
       pickupLat: (json['pickup_lat'] as num?)?.toDouble(),
       pickupLng: (json['pickup_lng'] as num?)?.toDouble(),
@@ -91,6 +94,7 @@ class TripModel {
       'ride_id': id,
       'initiator_id': initiatorId,
       'driver_id': driverId,
+      'vehicle_id': vehicleId,
       'pickup_location_name': pickupLocationName,
       'dropoff_location_name': dropoffLocationName,
       'proposed_fare': proposedFare,

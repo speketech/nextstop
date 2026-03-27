@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:geolocator/geolocator.dart';
-import 'socket_service.dart';
+import '../api/socket_service.dart';
 
 /// Manages GPS streaming and broadcasts the driver's location
 /// to the backend via WebSockets.

@@ -24,12 +24,14 @@ tasks.register<Delete>("clean") {
 }
 
 subprojects {
-    pluginManager.withPlugin("com.android.library") {
-        val androidExt = project.extensions.findByName("android") as? com.android.build.gradle.LibraryExtension
-        if (androidExt != null && androidExt.namespace == null) {
-            val generatedNamespace = "com.interswitchng." + project.name.replace("-", "_").replace(".", "_")
-            androidExt.namespace = generatedNamespace
-            println("Injected namespace $generatedNamespace into ${project.name}")
+    afterEvaluate {
+        if (project.name == "isw_mobile_sdk") {
+            val extension = project.extensions.getByName("android")
+            if (extension is com.android.build.gradle.LibraryExtension) {
+                if (extension.namespace == null) {
+                    extension.namespace = "com.interswitchgroup.isw_mobile_sdk"
+                }
+            }
         }
     }
 }

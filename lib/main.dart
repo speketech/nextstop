@@ -23,11 +23,10 @@ void main() async {
   if (!kIsWeb) {
     // Interswitch SDK Configuration from .env
     var config = IswSdkConfig(
-      merchantId: dotenv.env['ISW_MERCHANT_ID'] ?? 'MX276440',
-      payItemId: dotenv.env['ISW_PAY_ITEM_ID'] ?? 'Default_Payable_MX276440',
-      clientId: dotenv.env['ISW_CLIENT_ID'] ?? '',
-      secretKey: dotenv.env['ISW_SECRET_KEY'] ?? '',
-      env: Environment.TEST,
+      dotenv.env['ISW_MERCHANT_ID'] ?? 'MX276440',
+      dotenv.env['ISW_PAY_ITEM_ID'] ?? 'Default_Payable_MX276440',
+      dotenv.env['ISW_CLIENT_ID'] ?? '',
+      dotenv.env['ISW_SECRET_KEY'] ?? '',
     );
     await IswMobileSdk.initialize(config);
   }

@@ -7,7 +7,7 @@ class MockTripRepository implements TripRepository {
   @override
   Future<List<TripModel>> getAvailableTrips() async {
     await Future.delayed(const Duration(seconds: 1));
-    return _trips.where((t) => t.status == RideStatus.requested || t.status == RideStatus.negotiating).toList();
+    return _trips.where((t) => t.status == RideStatus.pending_driver_match || t.status == RideStatus.negotiating).toList();
   }
 
   @override
@@ -28,13 +28,13 @@ class MockTripRepository implements TripRepository {
         initiatorId: old.initiatorId,
         driverId: old.driverId,
         vehicleId: old.vehicleId,
-        pickupAddress: old.pickupAddress,
+        pickupLocationName: old.pickupLocationName,
         pickupLat: old.pickupLat,
         pickupLng: old.pickupLng,
-        dropoffAddress: old.dropoffAddress,
+        dropoffLocationName: old.dropoffLocationName,
         dropoffLat: old.dropoffLat,
         dropoffLng: old.dropoffLng,
-        baseFare: old.baseFare,
+        proposedFare: old.proposedFare,
         rideType: old.rideType,
         maxJoiners: old.maxJoiners,
         womenOnly: old.womenOnly,
@@ -61,17 +61,17 @@ class MockTripRepository implements TripRepository {
         initiatorId: old.initiatorId,
         driverId: driverId,
         vehicleId: old.vehicleId,
-        pickupAddress: old.pickupAddress,
+        pickupLocationName: old.pickupLocationName,
         pickupLat: old.pickupLat,
         pickupLng: old.pickupLng,
-        dropoffAddress: old.dropoffAddress,
+        dropoffLocationName: old.dropoffLocationName,
         dropoffLat: old.dropoffLat,
         dropoffLng: old.dropoffLng,
-        baseFare: amount,
+        proposedFare: amount,
         rideType: old.rideType,
         maxJoiners: old.maxJoiners,
         womenOnly: old.womenOnly,
-        status: RideStatus.accepted,
+        status: RideStatus.driver_assigned,
       );
       _trips[index] = updated;
       return updated;
