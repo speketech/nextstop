@@ -132,7 +132,7 @@ class _RouteChannelScreenState extends State<RouteChannelScreen> {
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          '📌 Topic: What\'s the most impactful tech trend in Lagos right now?',
+                          'Topic: What\'s the most impactful tech trend in Lagos right now?',
                           style: GoogleFonts.roboto(
                             color: AppColors.professionalWhite,
                             fontSize: 13,

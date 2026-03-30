@@ -24,7 +24,7 @@ class RealAuthRepository implements AuthRepository {
     final response = await apiClient.post('/auth/signup', data: {
       'fullName': '$firstName $lastName', // Backend expects single fullName string
       'email': email,
-      'phone': phone, // 👈 FIX: Matches backend 'phone' requirement
+      'phone': phone, // FIX: Matches backend 'phone' requirement
       'password': password,
       'role': role.toUpperCase(), // Backend expects 'PASSENGER' or 'DRIVER'
     });

@@ -35,7 +35,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> {
           const GoogleMap(
             initialCameraPosition: _initialPosition,
             zoomControlsEnabled: false,
-            myLocationEnabled: true,
+            myLocationEnabled: false, // Disabled to prevent main thread UI freezes/timeouts without permissions
             myLocationButtonEnabled: false,
             mapType: MapType.normal,
           ),

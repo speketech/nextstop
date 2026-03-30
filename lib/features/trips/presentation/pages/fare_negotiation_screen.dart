@@ -16,10 +16,25 @@ class _FareNegotiationScreenState extends State<FareNegotiationScreen> {
   final double _estimatedFareMax = 2500;
 
   String get _fairnessLabel {
-    if (_proposedFare < _estimatedFareMin) return '⚠️ Below average — Match speed is low';
-    if (_proposedFare > _estimatedFareMax) return '🚀 Premium offer — Fastest match!';
-    return '✅ This fare is near average for this route';
+    if (_proposedFare < _estimatedFareMin) return 'Below average — Match speed is low';
+    if (_proposedFare > _estimatedFareMax) return 'Premium offer — Fastest match!';
+    return 'This fare is near average for this route';
   }
+
+  final List<Map<String, dynamic>> _mockOffers = [
+    {
+      'name': 'Driver Emeka',
+      'rating': 4.8,
+      'avatarUrl': 'https://i.pravatar.cc/150?img=11',
+      'offerMargin': 150,
+    },
+    {
+      'name': 'Driver Yusuf',
+      'rating': 4.9,
+      'avatarUrl': 'https://i.pravatar.cc/150?img=12',
+      'offerMargin': 300,
+    },
+  ];
 
   Color get _sliderAccent {
     if (_proposedFare < _estimatedFareMin) return AppColors.danger;
@@ -204,9 +219,10 @@ class _FareNegotiationScreenState extends State<FareNegotiationScreen> {
               // Driver Counter-Offer Cards – "Incoming Call" style
               Expanded(
                 child: ListView.builder(
-                  itemCount: 2,
+                  itemCount: _mockOffers.length,
                   itemBuilder: (context, index) {
-                    final offerAmount = (_proposedFare + (index * 200) + 100).toInt();
+                    final offer = _mockOffers[index];
+                    final offerAmount = (_proposedFare + offer['offerMargin']).toInt();
                     return Container(
                       margin: const EdgeInsets.only(bottom: 12),
                       padding: const EdgeInsets.all(16),
@@ -220,7 +236,7 @@ class _FareNegotiationScreenState extends State<FareNegotiationScreen> {
                         children: [
                           CircleAvatar(
                             radius: 22,
-                            backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=${index + 20}'),
+                            backgroundImage: NetworkImage(offer['avatarUrl'] as String),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -228,14 +244,14 @@ class _FareNegotiationScreenState extends State<FareNegotiationScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Driver ${index == 0 ? 'Emeka' : 'Yusuf'}',
+                                  offer['name'] as String,
                                   style: GoogleFonts.inter(fontWeight: FontWeight.w700, color: AppColors.corporateSlate),
                                 ),
                                 Row(
                                   children: [
                                     const Icon(Icons.star, color: AppColors.secondary, size: 14),
                                     Text(
-                                      ' ${4.7 + index * 0.2}',
+                                      ' ${offer['rating']}',
                                       style: GoogleFonts.roboto(fontSize: 13, color: AppColors.textSubtleDark),
                                     ),
                                   ],
@@ -254,6 +270,7 @@ class _FareNegotiationScreenState extends State<FareNegotiationScreen> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.secondary, // Danfo Yellow Accept per spec
                                   foregroundColor: AppColors.professionalWhite,
+                                  minimumSize: Size.zero,
                                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                   elevation: 0,

@@ -47,7 +47,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
           const GoogleMap(
             initialCameraPosition: _initialPosition,
             zoomControlsEnabled: false,
-            myLocationEnabled: true,
+            myLocationEnabled: false, // Disabled to prevent main thread UI freezes/timeouts without permissions
             myLocationButtonEnabled: false,
             // Assuming we'd add polygons/heatmaps for "High-Value Professional Zones" here
           ),

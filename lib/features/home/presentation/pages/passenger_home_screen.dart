@@ -29,26 +29,39 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
+      body: IndexedStack(
+        index: _selectedIndex,
         children: [
-          // Background Map Placeholder
-          const GoogleMap(
-            initialCameraPosition: _initialPosition,
-            zoomControlsEnabled: false,
-            myLocationEnabled: true,
-            myLocationButtonEnabled: false,
-            mapType: MapType.normal,
+          Stack(
+            children: [
+              // Background Map Placeholder
+              Positioned.fill(
+                child: Container(
+                  color: const Color(0xFFE0E0E0), // Fallback if map fails
+                  child: const GoogleMap(
+                    initialCameraPosition: _initialPosition,
+                    zoomControlsEnabled: false,
+                    myLocationEnabled: false, // Disabled to prevent main thread UI freezes/timeouts without permissions
+                    myLocationButtonEnabled: false,
+                    mapType: MapType.normal,
+                  ),
+                ),
+              ),
+              
+              SafeArea(
+                child: Column(
+                  children: [
+                    _buildTopBar(),
+                    const Spacer(),
+                    _buildBookingCard(),
+                  ],
+                ),
+              ),
+            ],
           ),
-          
-          SafeArea(
-            child: Column(
-              children: [
-                _buildTopBar(),
-                const Spacer(),
-                _buildBookingCard(),
-              ],
-            ),
-          ),
+          const Center(child: Text('Search Screen Placeholder')),
+          const Center(child: Text('Rides Screen Placeholder')),
+          const Center(child: Text('Profile Screen Placeholder')),
         ],
       ),
       bottomNavigationBar: _buildBottomNav(),
@@ -207,7 +220,7 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
               elevation: 0,
             ),
             child: Text(
-              'Book My Danfo',
+              'Book My Ride',
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,

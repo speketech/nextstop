@@ -4,7 +4,7 @@ class AppColors {
   // Primary: "Lagos Electric Blue" - Professionalism and trust.
   static const Color primary = Color(0xFF007BFF); 
   
-  // Secondary: "Danfo Yellow" - Highlights, available seats, local touch.
+  // Secondary: "Ride Yellow" - Highlights, available seats, local touch.
   static const Color secondary = Color(0xFFFFD700); 
 
   // Corporate Slate - Deep rich charcoal/navy for backgrounds/text

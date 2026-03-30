@@ -31,8 +31,8 @@ class SocketService {
 
     socket?.connect();
 
-    socket?.onConnect((_) => print('✅ Connected to Real-Time Server'));
-    socket?.onDisconnect((_) => print('❌ Disconnected from Real-Time Server'));
+    socket?.onConnect((_) => print('Connected to Real-Time Server'));
+    socket?.onDisconnect((_) => print('Disconnected from Real-Time Server'));
     socket?.onConnectError((err) => print('Socket Connection Error: $err'));
   }
 
@@ -49,8 +49,8 @@ class SocketService {
           .build(),
     );
     socket?.connect();
-    socket?.onConnect((_) => print('✅ Socket connected (via initSocket)'));
-    socket?.onDisconnect((_) => print('❌ Socket disconnected'));
+    socket?.onConnect((_) => print('Socket connected (via initSocket)'));
+    socket?.onDisconnect((_) => print('Socket disconnected'));
     socket?.onConnectError((err) => print('Socket error: $err'));
   }
 
