@@ -1,42 +1,50 @@
 #!/usr/bin/env bash
 
-# 1. Exit immediately if a command exits with a non-zero status
+# 1. Exit immediately on any error
 set -e
 
-echo "Starting NextStop Build Process..."
+echo "Starting NextStop Full Web Build..."
 
-# 2. Setup Flutter (Correct pathing and fresh clone check)
+# 2. Setup Flutter (Fresh clone if missing)
 if [ ! -f "flutter/bin/flutter" ]; then
-  echo "Flutter not found or corrupted. Cleaning and Cloning..."
+  echo "Cloning Flutter SDK..."
   rm -rf flutter
   git clone --depth 1 https://github.com/flutter/flutter.git -b stable
 fi
 
-# Add Flutter to the absolute path
 export PATH="$PWD/flutter/bin:$PATH"
 
-# 3. THE ASSET FIX: Create a placeholder .env file
-# Flutter fails if an asset listed in pubspec.yaml is missing
+# 3. HANDLE ASSETS: Create placeholder .env
+# This prevents the "No file or variants found for asset: .env" error
 if [ ! -f ".env" ]; then
-  echo "Creating placeholder .env for the asset bundler..."
+  echo "Creating placeholder .env for asset bundling..."
   touch .env
-  # We add a default API URL so the app has a fallback
   echo "API_URL=https://nextstop-api-ua95.onrender.com/api" > .env
 fi
 
-# 4. Web Configuration
-echo "Configuring project for Web..."
+# 4. WEB CONFIGURATION
 flutter config --enable-web
-# Force-create the web folder if it was missing from the repo
+# Ensures the web folder and index.html exist
 flutter create . --platforms web 
 
-# 5. Prepare Dependencies
+# 5. THE INJECTION: Swap Google Maps API Key
+# Extract the key from your .env file
+MAP_KEY=$(grep GOOGLE_MAPS_API_KEY .env | cut -d '=' -f2)
+
+if [ -z "$MAP_KEY" ]; then
+  echo "WARNING: GOOGLE_MAPS_API_KEY not found in .env. Map will be blank."
+else
+  echo "Injecting API Key into index.html..."
+  # Replaces the placeholder in web/index.html with the actual key
+  sed -i "s/GOOGLE_MAPS_PLACEHOLDER/$MAP_KEY/g" web/index.html
+fi
+
+# 6. BUILD PROCESS
 echo "Fetching dependencies..."
 flutter pub get
 
-# 6. Build for Web (Release mode)
-# Added --no-wasm-dry-run to silence the warnings about incompatible packages
 echo "Building for Web (Release)..."
+# Using --no-wasm-dry-run to bypass incompatible package warnings
 flutter build web --release --no-wasm-dry-run
 
 echo "Build Complete! Files are in build/web"

@@ -13,10 +13,15 @@ if (localPropertiesFile.exists()) {
     localPropertiesFile.inputStream().use { localProperties.load(it) }
 }
 
+// ─── 🚀 LOAD .ENV FROM FLUTTER ROOT ──────────────────────────────────────────
 val envProperties = Properties()
-val envFile = project.rootProject.file(".env")
+// We use "../../.env" because this file is in android/app/
+// and .env is in the main project root.
+val envFile = project.rootProject.file("../.env") 
 if (envFile.exists()) {
     envFile.inputStream().use { envProperties.load(it) }
+} else {
+    logger.warn("⚠️ .env file not found at ${envFile.absolutePath}")
 }
 
 val mapsApiKey = envProperties.getProperty("GOOGLE_MAPS_API_KEY") ?: ""
@@ -36,21 +41,18 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.nextstop"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
 
+        // Inject the API key into the Manifest
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
         }
