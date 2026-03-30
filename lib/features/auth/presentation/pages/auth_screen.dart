@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:nextstop/features/auth/domain/models/user_model.dart';
 import '../../../../core/app_colors.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
@@ -87,7 +88,11 @@ class _AuthScreenState extends State<AuthScreen> {
             MaterialPageRoute(builder: (_) => OtpVerificationScreen(emailOrPhone: state.emailOrPhone)),
           );
         } else if (state is AuthAuthenticated) {
-          Navigator.pushReplacementNamed(context, '/dashboard');
+          if (state.user.role == UserRole.driver) {
+            Navigator.pushReplacementNamed(context, '/driver_dashboard');
+          } else {
+            Navigator.pushReplacementNamed(context, '/dashboard');
+          }
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message), backgroundColor: AppColors.danger),

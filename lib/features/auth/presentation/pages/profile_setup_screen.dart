@@ -74,12 +74,10 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
       listener: (context, state) {
         if (state is AuthAuthenticated && state.user.ninVerified) {
           // If profile is "completed" (verified in our mock), go to home
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-              builder: (_) => state.user.role == UserRole.driver 
-                  ? const DriverHomeScreen() 
-                  : const PassengerHomeScreen(),
-            ),
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            state.user.role == UserRole.driver 
+                ? '/driver_dashboard' 
+                : '/dashboard',
             (route) => false,
           );
         } else if (state is AuthError) {

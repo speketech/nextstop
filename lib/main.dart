@@ -18,6 +18,8 @@ import 'features/trips/presentation/bloc/trip_bloc.dart';
 import 'core/api/api_client.dart';
 import 'core/api/socket_service.dart';
 import 'screens/driver_wallet_screen.dart';
+import 'features/home/presentation/pages/passenger_home_screen.dart';
+import 'features/home/presentation/pages/driver_home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -79,8 +81,8 @@ class NextStopApp extends StatelessWidget {
       home: const SplashScreen(),
       routes: {
         '/nin_verification': (context) => const NinVerificationScreen(),
-        '/driver_dashboard': (context) => const Scaffold(body: Center(child: Text('Driver Dashboard'))),
-        '/dashboard': (context) => const Scaffold(body: Center(child: Text('Passenger Dashboard'))),
+        '/driver_dashboard': (context) => const DriverHomeScreen(),
+        '/dashboard': (context) => const PassengerHomeScreen(),
         '/add_bank': (context) => AddBankAccountPage(
               authRepository: context.read<RealAuthRepository>(),
             ),

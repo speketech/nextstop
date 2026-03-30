@@ -28,7 +28,6 @@ class PaymentSuccessDialog extends StatelessWidget {
               height: 150,
               repeat: false,
               errorBuilder: (context, error, stackTrace) {
-                // Fallback icon if the Lottie file is missing
                 return Container(
                   width: 150,
                   height: 150,
@@ -72,7 +71,10 @@ class PaymentSuccessDialog extends StatelessWidget {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
-                  shape: BorderRadius.circular(12),
+                  // FIX: Changed BorderRadius to RoundedRectangleBorder
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 child: Text(
                   'Continue',
