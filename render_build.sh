@@ -1,36 +1,35 @@
 #!/usr/bin/env bash
 
-# 1. Exit immediately if a command exits with a non-zero status
+# 1. Exit on any error
 set -e
 
-# 2. Clone Flutter (Shallow clone to save time and avoid timeouts)
-if [ ! -d "flutter" ]; then
-  echo "Cloning Flutter..."
+echo "Starting NextStop Build Process..."
+
+# 2. Check if Flutter binary exists. If not, delete the folder and re-clone.
+# This fixes the "command not found" error from corrupted previous builds
+if [ ! -f "flutter/bin/flutter" ]; then
+  echo "Flutter not found or corrupted. Cleaning and Cloning..."
+  rm -rf flutter
   git clone --depth 1 https://github.com/flutter/flutter.git -b stable
+else
+  echo "Existing Flutter installation found."
 fi
 
-# 3. Add Flutter to the FRONT of the path using the absolute PWD
+# 3. Use absolute path for reliability
 export PATH="$PWD/flutter/bin:$PATH"
 
-# 4. Verify Flutter was installed correctly
+# 4. Final verification of the command
 if ! command -v flutter &> /dev/null
 then
-    echo "Error: Flutter command not found even after export."
+    echo "FATAL: Flutter still not found. Check Render disk space."
     exit 1
 fi
 
-echo "Flutter found at: $(command -v flutter)"
+echo "Flutter is ready: $(flutter --version | head -n 1)"
 
-# 5. Enable web support and ensure web folder exists
+# 5. Build for Web
 flutter config --enable-web
-if [ ! -d "web" ]; then
-  echo "Generating web platform files..."
-  flutter create . --platforms web 
-fi
-
-# 6. Build the project
-echo "Running pub get..."
 flutter pub get
+flutter build web --release --web-renderer canvaskit
 
-echo "Building Flutter Web (Release mode)..."
-flutter build web --release
+echo "Build Complete! Files are in build/web"
