@@ -13,4 +13,6 @@ abstract class TripRepository {
     required String customerEmail,
     required String customerId,
   });
+  Future<TripModel> getRideDetails(String rideId);
+  Future<void> joinRide(String rideId);
 }

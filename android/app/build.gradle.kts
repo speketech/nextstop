@@ -24,7 +24,7 @@ if (envFile.exists()) {
     logger.warn("⚠️ .env file not found at ${envFile.absolutePath}")
 }
 
-val mapsApiKey = envProperties.getProperty("GOOGLE_MAPS_API_KEY") ?: ""
+val mapsApiKey = envProperties.getProperty("Maps_API_KEY") ?: ""
 
 android {
     namespace = "com.example.nextstop"

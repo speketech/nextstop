@@ -3,6 +3,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../../core/app_colors.dart';
 import '../../../trips/presentation/pages/ride_booking_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'passenger_search_screen.dart';
+import 'passenger_rides_screen.dart';
+import 'passenger_profile_screen.dart';
 
 class PassengerHomeScreen extends StatefulWidget {
   const PassengerHomeScreen({super.key});
@@ -59,9 +62,9 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
               ),
             ],
           ),
-          const Center(child: Text('Search Screen Placeholder')),
-          const Center(child: Text('Rides Screen Placeholder')),
-          const Center(child: Text('Profile Screen Placeholder')),
+          const PassengerSearchScreen(),
+          const PassengerRidesScreen(),
+          const PassengerProfileScreen(),
         ],
       ),
       bottomNavigationBar: _buildBottomNav(),

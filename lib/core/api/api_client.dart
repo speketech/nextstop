@@ -1,24 +1,34 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart'; // Required for kReleaseMode
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiClient {
   late final Dio _dio;
-  late final Dio _tokenDio; // Dedicated instance for refreshing tokens
+  late final Dio _tokenDio;
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
+  // Always use the Render production URL — both in debug and release.
+  // This is safe because the URL itself is not a secret.
+  static const String _productionUrl = 'https://nextstop-api-ua95.onrender.com/api';
+
   static BaseOptions _baseOptions() {
-    // 1. Dynamic Base URL Selection
-    // If in Release mode (Render), use the production URL. 
-    // Otherwise, check .env or fallback to localhost.
-    const String productionUrl = 'https://nextstop-api-ua95.onrender.com/api';
-    const String localUrl = 'http://localhost:3000/api';
+    // Sanitize the URL from .env: trim whitespace/newlines which cause DNS failures
+    String apiUrl = (dotenv.env['API_URL'] ?? _productionUrl).trim().replaceAll('\r', '').replaceAll('\n', '');
+    
+    // Ensure it ends with /api if it's the production domain but missing it
+    if (apiUrl.contains('onrender.com') && !apiUrl.endsWith('/api')) {
+      apiUrl = apiUrl.endsWith('/') ? '${apiUrl}api' : '$apiUrl/api';
+    }
+
+    debugPrint('🚀 ApiClient: Using Base URL -> $apiUrl');
 
     return BaseOptions(
-      baseUrl: kReleaseMode ? productionUrl : (dotenv.env['API_URL'] ?? localUrl),
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
+      baseUrl: apiUrl,
+      // Render free-tier services sleep after 15 mins inactivity.
+      // Cold start can take 30-60 seconds — give it time.
+      connectTimeout: const Duration(seconds: 60),
+      receiveTimeout: const Duration(seconds: 60),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -30,9 +40,8 @@ class ApiClient {
     _dio = Dio(_baseOptions());
     _tokenDio = Dio(_baseOptions());
 
-    // 2. The Interceptor Architecture
     _dio.interceptors.add(QueuedInterceptorsWrapper(
-      // --- ON REQUEST: Attach the Access Token ---
+      // Attach JWT access token to every request
       onRequest: (options, handler) async {
         final String? accessToken = await _storage.read(key: 'access_token');
         if (accessToken != null) {
@@ -41,17 +50,14 @@ class ApiClient {
         return handler.next(options);
       },
 
-      // --- ON ERROR: Handle 401 Unauthorized (Token Expiry) ---
+      // Handle server errors with user-friendly messages
       onError: (DioException error, handler) async {
+        // ── Token expiry: refresh and retry ──────────────
         if (error.response?.statusCode == 401) {
-          // Attempt to refresh the token
           final bool isRefreshed = await _refreshToken();
-
           if (isRefreshed) {
-            // Retry the original request with the new token
             final String? newAccessToken = await _storage.read(key: 'access_token');
             error.requestOptions.headers['Authorization'] = 'Bearer $newAccessToken';
-
             try {
               final response = await _dio.fetch(error.requestOptions);
               return handler.resolve(response);
@@ -59,23 +65,37 @@ class ApiClient {
               return handler.next(retryError);
             }
           } else {
-            // Refresh failed — clear storage and force logout
             await _logoutUser();
             return handler.next(error);
           }
         }
+
+        // ── Network/DNS errors: wrap with friendly message ─
+        if (error.type == DioExceptionType.connectionError ||
+            error.type == DioExceptionType.connectionTimeout ||
+            error.type == DioExceptionType.unknown) {
+          debugPrint('🌐 Network error: ${error.message}');
+          // Re-throw with a friendlier message that the UI can display
+          return handler.next(DioException(
+            requestOptions: error.requestOptions,
+            error: error.error,
+            type: error.type,
+            message: 'Cannot reach the server. '
+                'The backend may be starting up (this can take ~30s on first use). '
+                'Please try again in a moment.',
+          ));
+        }
+
         return handler.next(error);
       },
     ));
   }
 
-  // 3. Token Refresh Logic (Server-to-Server)
   Future<bool> _refreshToken() async {
     try {
       final String? refreshToken = await _storage.read(key: 'refresh_token');
       if (refreshToken == null) return false;
 
-      // Use _tokenDio to avoid interceptor recursion
       final response = await _tokenDio.post('/auth/refresh', data: {
         'refreshToken': refreshToken,
       });
@@ -96,10 +116,8 @@ class ApiClient {
   Future<void> _logoutUser() async {
     await _storage.deleteAll();
     debugPrint('Session expired. User logged out.');
-    // Navigation to Login should be handled by your AuthBloc/State management
   }
 
-  // 4. Convenience Methods
   Future<Response> get(String path, {Map<String, dynamic>? queryParameters}) async =>
       await _dio.get(path, queryParameters: queryParameters);
 
@@ -108,6 +126,9 @@ class ApiClient {
 
   Future<Response> put(String path, {dynamic data}) async =>
       await _dio.put(path, data: data);
+
+  Future<Response> patch(String path, {dynamic data}) async =>
+      await _dio.patch(path, data: data);
 
   Future<Response> delete(String path) async =>
       await _dio.delete(path);

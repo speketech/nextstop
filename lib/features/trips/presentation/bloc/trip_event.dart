@@ -63,3 +63,19 @@ class ProcessPayment extends TripEvent {
   @override
   List<Object?> get props => [rideId, payerType, customerName, customerEmail, customerId];
 }
+
+class GetRideDetails extends TripEvent {
+  final String rideId;
+  const GetRideDetails(this.rideId);
+
+  @override
+  List<Object?> get props => [rideId];
+}
+
+class JoinRide extends TripEvent {
+  final String rideId;
+  const JoinRide(this.rideId);
+
+  @override
+  List<Object?> get props => [rideId];
+}

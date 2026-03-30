@@ -117,4 +117,15 @@ class RealTripRepository implements TripRepository {
       rethrow;
     }
   }
+
+  @override
+  Future<TripModel> getRideDetails(String rideId) async {
+    final response = await apiClient.get('/rides/$rideId');
+    return TripModel.fromJson(response.data);
+  }
+
+  @override
+  Future<void> joinRide(String rideId) async {
+    await apiClient.post('/rides/$rideId/join');
+  }
 }

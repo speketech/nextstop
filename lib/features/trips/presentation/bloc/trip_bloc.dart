@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:dio/dio.dart';
 import '../../domain/repositories/trip_repository.dart';
 import 'trip_event.dart';
 import 'trip_state.dart';
@@ -12,6 +13,8 @@ class TripBloc extends Bloc<TripEvent, TripState> {
     on<PlaceBid>(_onPlaceBid);
     on<AcceptBid>(_onAcceptBid);
     on<ProcessPayment>(_onProcessPayment);
+    on<GetRideDetails>(_onGetRideDetails);
+    on<JoinRide>(_onJoinRide);
   }
 
   Future<void> _onProcessPayment(ProcessPayment event, Emitter<TripState> emit) async {
@@ -26,7 +29,8 @@ class TripBloc extends Bloc<TripEvent, TripState> {
       );
       emit(PaymentSuccess());
     } catch (e) {
-      emit(TripError(e.toString()));
+      final message = (e is DioException) ? (e.message ?? e.toString()) : e.toString();
+      emit(TripError(message));
     }
   }
 
@@ -36,7 +40,8 @@ class TripBloc extends Bloc<TripEvent, TripState> {
       final trip = await tripRepository.initiateTrip(event.trip);
       emit(TripSuccess(trip));
     } catch (e) {
-      emit(TripError(e.toString()));
+      final message = (e is DioException) ? (e.message ?? e.toString()) : e.toString();
+      emit(TripError(message));
     }
   }
 
@@ -46,7 +51,8 @@ class TripBloc extends Bloc<TripEvent, TripState> {
       final trip = await tripRepository.updateTripStatus(event.tripId, event.status);
       emit(TripSuccess(trip));
     } catch (e) {
-      emit(TripError(e.toString()));
+      final message = (e is DioException) ? (e.message ?? e.toString()) : e.toString();
+      emit(TripError(message));
     }
   }
 
@@ -56,7 +62,8 @@ class TripBloc extends Bloc<TripEvent, TripState> {
       final trip = await tripRepository.placeBid(event.tripId, event.driverId, event.bidAmount);
       emit(TripSuccess(trip));
     } catch (e) {
-      emit(TripError(e.toString()));
+      final message = (e is DioException) ? (e.message ?? e.toString()) : e.toString();
+      emit(TripError(message));
     }
   }
 
@@ -66,7 +73,32 @@ class TripBloc extends Bloc<TripEvent, TripState> {
       final trip = await tripRepository.acceptBid(event.tripId, event.driverId, event.amount);
       emit(TripSuccess(trip));
     } catch (e) {
-      emit(TripError(e.toString()));
+      final message = (e is DioException) ? (e.message ?? e.toString()) : e.toString();
+      emit(TripError(message));
+    }
+  }
+
+  Future<void> _onGetRideDetails(GetRideDetails event, Emitter<TripState> emit) async {
+    emit(TripLoading());
+    try {
+      final trip = await tripRepository.getRideDetails(event.rideId);
+      emit(TripSuccess(trip));
+    } catch (e) {
+      final message = (e is DioException) ? (e.message ?? e.toString()) : e.toString();
+      emit(TripError(message));
+    }
+  }
+
+  Future<void> _onJoinRide(JoinRide event, Emitter<TripState> emit) async {
+    emit(TripLoading());
+    try {
+      await tripRepository.joinRide(event.rideId);
+      // Usually, after joining, we might want to refresh ride details
+      final trip = await tripRepository.getRideDetails(event.rideId);
+      emit(TripSuccess(trip));
+    } catch (e) {
+      final message = (e is DioException) ? (e.message ?? e.toString()) : e.toString();
+      emit(TripError(message));
     }
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:dio/dio.dart';
 import '../../../../core/api/socket_service.dart';
 import '../../domain/repositories/auth_repository.dart';
 import 'auth_event.dart';
@@ -28,7 +29,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await _handleSocketInit();
       emit(AuthAuthenticated(user));
     } catch (e) {
-      emit(AuthError(e.toString()));
+      final message = (e is DioException) ? (e.message ?? e.toString()) : e.toString();
+      emit(AuthError(message));
     }
   }
 
@@ -46,7 +48,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await _handleSocketInit();
       emit(AuthAuthenticated(user));
     } catch (e) {
-      emit(AuthError(e.toString()));
+      final message = (e is DioException) ? (e.message ?? e.toString()) : e.toString();
+      emit(AuthError(message));
     }
   }
 
@@ -56,7 +59,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await authRepository.requestWhatsAppOTP(event.phoneNumber);
       emit(OtpSentState(event.phoneNumber));
     } catch (e) {
-      emit(AuthError(e.toString()));
+      final message = (e is DioException) ? (e.message ?? e.toString()) : e.toString();
+      emit(AuthError(message));
     }
   }
 
@@ -66,7 +70,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await authRepository.verifyDriverNIN(event.nin);
       emit(NinVerified());
     } catch (e) {
-      emit(AuthError(e.toString()));
+      final message = (e is DioException) ? (e.message ?? e.toString()) : e.toString();
+      emit(AuthError(message));
     }
   }
 
@@ -93,7 +98,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await authRepository.sendOtp(event.emailOrPhone);
       emit(OtpSentState(event.emailOrPhone));
     } catch (e) {
-      emit(AuthError(e.toString()));
+      final message = (e is DioException) ? (e.message ?? e.toString()) : e.toString();
+      emit(AuthError(message));
     }
   }
 
@@ -104,7 +110,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await _handleSocketInit();
       emit(AuthAuthenticated(user));
     } catch (e) {
-      emit(AuthError(e.toString()));
+      final message = (e is DioException) ? (e.message ?? e.toString()) : e.toString();
+      emit(AuthError(message));
     }
   }
 
@@ -115,7 +122,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await _handleSocketInit();
       emit(AuthAuthenticated(user));
     } catch (e) {
-      emit(AuthError(e.toString()));
+      final message = (e is DioException) ? (e.message ?? e.toString()) : e.toString();
+      emit(AuthError(message));
     }
   }
 

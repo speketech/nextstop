@@ -89,4 +89,28 @@ class MockTripRepository implements TripRepository {
     await Future.delayed(const Duration(seconds: 2));
     print('Mock: Payment processed for ride $rideId');
   }
+
+  @override
+  Future<TripModel> getRideDetails(String rideId) async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    return _trips.firstWhere(
+      (t) => t.id == rideId,
+      orElse: () => TripModel(
+        id: rideId,
+        initiatorId: 'mock-initiator',
+        pickupLocationName: 'Lekki Phase 1',
+        dropoffLocationName: 'Victoria Island',
+        proposedFare: 2500,
+        rideType: RideType.ride_share,
+        maxJoiners: 3,
+        currentJoinersCount: 1,
+      ),
+    );
+  }
+
+  @override
+  Future<void> joinRide(String rideId) async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    print('Mock: Join requested for ride $rideId');
+  }
 }
