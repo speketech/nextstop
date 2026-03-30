@@ -32,7 +32,13 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
         actions: [
           Row(
             children: [
-              Text(_isOnline ? 'Online' : 'Offline', style: const TextStyle(fontWeight: FontWeight.bold)),
+              Text(
+                _isOnline ? 'Online' : 'Offline',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  shadows: [Shadow(color: Colors.white, blurRadius: 4, offset: Offset(0, 1))],
+                ),
+              ),
               Switch(
                 value: _isOnline,
                 onChanged: (val) => setState(() => _isOnline = val),
@@ -74,11 +80,16 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('Today\'s Earnings', style: TextStyle(color: AppColors.textSubtle)),
+                            const Text('Today\'s Earnings', style: TextStyle(color: AppColors.textSubtleDark, fontWeight: FontWeight.w600)),
                             Text('₦15,400', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold, color: AppColors.primary)),
                           ],
                         ),
-                        IconButton(icon: const Icon(Icons.arrow_forward_ios, size: 16), onPressed: (){})
+                        IconButton(
+                          icon: const Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.primary),
+                          onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => const PaymentTransparencyScreen()));
+                          },
+                        )
                       ],
                     ),
                   ),
@@ -171,7 +182,11 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Ride request dismissed. Staying online for next professional match.')),
+                      );
+                    },
                     style: OutlinedButton.styleFrom(foregroundColor: AppColors.danger, side: const BorderSide(color: AppColors.danger)),
                     child: const Text('Reject'),
                   ),

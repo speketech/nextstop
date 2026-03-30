@@ -57,7 +57,7 @@ class PassengerProfileScreen extends StatelessWidget {
             children: [
               Stack(
                 children: [
-                  const CircleAvatar(
+                  CircleAvatar(
                     radius: 50,
                     backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=11'),
                   ),
@@ -91,32 +91,33 @@ class PassengerProfileScreen extends StatelessWidget {
         const SizedBox(height: 32),
 
         // Settings Sections
-        Text('ACCOUNT', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textSubtle)),
+        Text('ACCOUNT', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textSubtleDark, letterSpacing: 1.2)),
         const SizedBox(height: 8),
-        _buildListTile(icon: Icons.person_outline, title: 'Personal Information'),
-        _buildListTile(icon: Icons.work_outline, title: 'Professional Identity'),
-        _buildListTile(icon: Icons.shield_outlined, title: 'Verification & Safety'),
+        _buildListTile(context: context, icon: Icons.person_outline, title: 'Personal Information'),
+        _buildListTile(context: context, icon: Icons.work_outline, title: 'Professional Identity'),
+        _buildListTile(context: context, icon: Icons.shield_outlined, title: 'Verification & Safety'),
 
         const SizedBox(height: 24),
-        Text('COMMUTE', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textSubtle)),
+        Text('COMMUTE', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textSubtleDark, letterSpacing: 1.2)),
         const SizedBox(height: 8),
-        _buildListTile(icon: Icons.favorite_border, title: 'Saved Routes'),
+        _buildListTile(context: context, icon: Icons.favorite_border, title: 'Saved Routes'),
         _buildListTile(
-          icon: Icons.directions_car_outlined, 
-          title: 'Commute Preferences', 
+          context: context,
+          icon: Icons.directions_car_outlined,
+          title: 'Commute Preferences',
           subtitle: 'Enable recurring commute',
         ),
 
         const SizedBox(height: 24),
-        Text('SUPPORT', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textSubtle)),
+        Text('SUPPORT', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textSubtleDark, letterSpacing: 1.2)),
         const SizedBox(height: 8),
-        _buildListTile(icon: Icons.help_outline, title: 'Help Center'),
-        _buildListTile(icon: Icons.info_outline, title: 'About NextStop'),
+        _buildListTile(context: context, icon: Icons.help_outline, title: 'Help Center'),
+        _buildListTile(context: context, icon: Icons.info_outline, title: 'About NextStop'),
       ],
     );
   }
 
-  Widget _buildListTile({required IconData icon, required String title, String? subtitle}) {
+  Widget _buildListTile({required BuildContext context, required IconData icon, required String title, String? subtitle}) {
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 8),
@@ -128,8 +129,12 @@ class PassengerProfileScreen extends StatelessWidget {
         leading: Icon(icon, color: AppColors.corporateSlate),
         title: Text(title, style: GoogleFonts.inter(fontWeight: FontWeight.w500, color: AppColors.textBody)),
         subtitle: subtitle != null ? Text(subtitle, style: GoogleFonts.roboto(color: AppColors.textSubtleDark)) : null,
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.textSubtle),
-        onTap: () {},
+        trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.textSubtleDark),
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('$title details coming soon to your professional profile.')),
+          );
+        },
       ),
     );
   }

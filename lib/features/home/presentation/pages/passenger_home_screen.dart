@@ -130,8 +130,9 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
                   Text(
                     'Where to, professional?',
                     style: GoogleFonts.roboto(
-                      color: AppColors.professionalWhite.withOpacity(0.8),
+                      color: AppColors.professionalWhite.withOpacity(0.95), // Increased opacity for contrast
                       fontSize: 15,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
@@ -203,7 +204,7 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
                 Expanded(
                   child: Text(
                     'Connect with professionals on your route.',
-                    style: GoogleFonts.roboto(color: AppColors.textSubtleDark, fontSize: 13),
+                    style: GoogleFonts.roboto(color: AppColors.textSubtleDark, fontSize: 13, fontWeight: FontWeight.w500),
                   ),
                 ),
               ],

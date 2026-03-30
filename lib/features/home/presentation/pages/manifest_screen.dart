@@ -243,7 +243,11 @@ class _ManifestScreenState extends State<ManifestScreen> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Starting ride manifest navigation... Drive safely!')),
+              );
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               minimumSize: const Size(double.infinity, 56),
@@ -264,7 +268,7 @@ class _ManifestScreenState extends State<ManifestScreen> {
     return Column(
       children: [
         Text(value, style: GoogleFonts.inter(fontWeight: FontWeight.w800, fontSize: 20, color: valueColor)),
-        Text(label, style: GoogleFonts.roboto(color: AppColors.professionalWhite.withOpacity(0.7), fontSize: 12)),
+        Text(label, style: GoogleFonts.roboto(color: AppColors.professionalWhite.withOpacity(0.9), fontSize: 12, fontWeight: FontWeight.w500)),
       ],
     );
   }

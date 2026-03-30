@@ -30,7 +30,8 @@ class RealAuthRepository implements AuthRepository {
       await _storage.write(key: 'refresh_token', value: tokenData['refreshToken']);
 
       return UserModel(
-        id: '', phone: phone, email: email, firstName: firstName, lastName: lastName,
+        id: tokenData['userId'], phone: phone, email: email, firstName: firstName, lastName: lastName,
+        
         role: UserRole.values.firstWhere((e) => e.name == role.toLowerCase(), orElse: () => UserRole.passenger),
       );
     }

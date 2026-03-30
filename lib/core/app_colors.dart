@@ -28,8 +28,9 @@ class AppColors {
   static const Color textBody = corporateSlate;
   
   // Using a less bright grey for text, to ensure readability, while using subtleGrey for dividers
-  static const Color textSubtleDark = Color(0xFF7F8C8D); 
-  static const Color textSubtle = subtleGrey; 
+  // Improved contrast for subtle text to ensure accessibility on light backgrounds.
+  static const Color textSubtle = Color(0xFF718096); // Slate-500 equivalent (accessible contrast)
+  static const Color textSubtleDark = Color(0xFF4A5568); // Slate-700 equivalent
   
   static const LinearGradient premiumGradient = LinearGradient(
     colors: [Color(0xFF007BFF), Color(0xFF0056B3)], // Deeper blue gradient

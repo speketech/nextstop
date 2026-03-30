@@ -48,7 +48,11 @@ class ProfessionalSnapshotScreen extends StatelessWidget {
                           ),
                         ),
                         ElevatedButton.icon(
-                          onPressed: () {},
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Networking request sent to Seyi! We will notify you when they accept.')),
+                            );
+                          },
                           icon: const Icon(Icons.handshake),
                           label: const Text('Connect'),
                           style: ElevatedButton.styleFrom(
@@ -67,7 +71,7 @@ class ProfessionalSnapshotScreen extends StatelessWidget {
                     const SizedBox(height: 4),
                     const Align(
                       alignment: Alignment.centerLeft,
-                      child: Text('Senior Software Engineer at TechCo', style: TextStyle(fontSize: 16, color: AppColors.textSubtle)),
+                      child: Text('Senior Software Engineer at TechCo', style: TextStyle(fontSize: 16, color: AppColors.textSubtleDark, fontWeight: FontWeight.w500)),
                     ),
                     const SizedBox(height: 12),
                     
@@ -127,7 +131,13 @@ class ProfessionalSnapshotScreen extends StatelessWidget {
                         _buildMutualAvatar(),
                         Transform.translate(offset: const Offset(-10, 0), child: _buildMutualAvatar()),
                         Transform.translate(offset: const Offset(-20, 0), child: _buildMutualAvatar()),
-                        Transform.translate(offset: const Offset(-20, 0), child: const Text('  2 Mutuals from TechCo', style: TextStyle(color: AppColors.textSubtle))),
+                        Transform.translate(
+                          offset: const Offset(-20, 0),
+                          child: const Text(
+                            '  2 Mutuals from TechCo', 
+                            style: TextStyle(color: AppColors.textSubtleDark, fontWeight: FontWeight.w500),
+                          ),
+                        ),
                       ],
                     )
                   ],

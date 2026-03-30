@@ -17,7 +17,7 @@ class ApiClient {
       apiUrl = '$apiUrl/api';
     }
 
-    debugPrint('🚀 ApiClient: Final Base URL -> $apiUrl/');
+    debugPrint('ApiClient: Final Base URL -> $apiUrl/');
 
     return BaseOptions(
       baseUrl: '$apiUrl/', 

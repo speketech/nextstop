@@ -39,7 +39,7 @@ class PassengerRidesScreen extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.directions_car_outlined, size: 64, color: AppColors.textSubtle.withOpacity(0.5)),
+          Icon(Icons.directions_car_outlined, size: 64, color: AppColors.textSubtleDark.withOpacity(0.5)),
           const SizedBox(height: 16),
           Text(
             'No upcoming rides',
@@ -48,7 +48,7 @@ class PassengerRidesScreen extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'Book a ride to see it here.',
-            style: GoogleFonts.roboto(color: AppColors.textSubtle),
+            style: GoogleFonts.roboto(color: AppColors.textSubtleDark, fontSize: 14),
           ),
         ],
       ),
@@ -68,54 +68,62 @@ class PassengerRidesScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             side: const BorderSide(color: AppColors.subtleGrey, width: 1),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Yesterday, 5:30 PM', style: GoogleFonts.roboto(color: AppColors.textSubtleDark)),
-                    Text('₦1,500', style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: AppColors.textBody)),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                const Row(
-                  children: [
-                    Icon(Icons.circle, color: AppColors.primary, size: 10),
-                    SizedBox(width: 8),
-                    Text('Victoria Island', style: TextStyle(fontWeight: FontWeight.w500)),
-                  ],
-                ),
-                Container(
-                  margin: const EdgeInsets.only(left: 4),
-                  height: 16,
-                  width: 2,
-                  color: AppColors.subtleGrey,
-                ),
-                const Row(
-                  children: [
-                    Icon(Icons.location_on, color: AppColors.danger, size: 14),
-                    SizedBox(width: 6),
-                    Text('Lekki Phase 1', style: TextStyle(fontWeight: FontWeight.w500)),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    const Icon(Icons.star, color: AppColors.secondary, size: 16),
-                    const SizedBox(width: 4),
-                    Text('5.0', style: GoogleFonts.roboto(fontWeight: FontWeight.w600)),
-                    const Spacer(),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
-                      child: Text('Completed', style: GoogleFonts.roboto(color: AppColors.accent, fontSize: 12, fontWeight: FontWeight.bold)),
-                    )
-                  ],
-                )
-              ],
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Viewing past ride history and cost breakdown...')),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Yesterday, 5:30 PM', style: GoogleFonts.roboto(color: AppColors.textSubtleDark)),
+                      Text('₦1,500', style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: AppColors.textBody)),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Icon(Icons.circle, color: AppColors.primary, size: 10),
+                      const SizedBox(width: 8),
+                      const Text('Victoria Island', style: TextStyle(fontWeight: FontWeight.w500)),
+                    ],
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(left: 4),
+                    height: 16,
+                    width: 2,
+                    color: AppColors.subtleGrey,
+                  ),
+                  Row(
+                    children: [
+                      Icon(Icons.location_on, color: AppColors.danger, size: 14),
+                      const SizedBox(width: 6),
+                      const Text('Lekki Phase 1', style: TextStyle(fontWeight: FontWeight.w500)),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Icon(Icons.star, color: AppColors.secondary, size: 16),
+                      const SizedBox(width: 4),
+                      Text('5.0', style: GoogleFonts.roboto(fontWeight: FontWeight.w600)),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(color: AppColors.accent.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
+                        child: Text('Completed', style: GoogleFonts.roboto(color: AppColors.accent, fontSize: 12, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         );

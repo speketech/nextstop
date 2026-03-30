@@ -13,7 +13,7 @@ if (localPropertiesFile.exists()) {
     localPropertiesFile.inputStream().use { localProperties.load(it) }
 }
 
-// ─── 🚀 LOAD .ENV FROM FLUTTER ROOT ──────────────────────────────────────────
+// ─── LOAD .ENV FROM FLUTTER ROOT ──────────────────────────────────────────
 val envProperties = Properties()
 // We use "../../.env" because this file is in android/app/
 // and .env is in the main project root.
@@ -21,7 +21,7 @@ val envFile = project.rootProject.file("../.env")
 if (envFile.exists()) {
     envFile.inputStream().use { envProperties.load(it) }
 } else {
-    logger.warn("⚠️ .env file not found at ${envFile.absolutePath}")
+    logger.warn(".env file not found at ${envFile.absolutePath}")
 }
 
 val mapsApiKey = envProperties.getProperty("Maps_API_KEY") ?: ""
