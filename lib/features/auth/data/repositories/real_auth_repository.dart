@@ -21,7 +21,7 @@ class RealAuthRepository implements AuthRepository {
     required String role, // Expected: 'passenger' or 'driver'
   }) async {
     // 1. FIX: Send the exact keys the backend validator requires
-    final response = await apiClient.post('/auth/signup', data: {
+    final response = await apiClient.post('auth/signup', data: {
       'fullName': '$firstName $lastName', // Backend expects single fullName string
       'email': email,
       'phone': phone, // FIX: Matches backend 'phone' requirement
@@ -56,7 +56,7 @@ class RealAuthRepository implements AuthRepository {
 
   @override
   Future<UserModel> login({required String email, required String password}) async {
-    final response = await apiClient.post('/auth/login', data: {
+    final response = await apiClient.post('auth/login', data: {
       'email': email,
       'password': password,
     });
@@ -79,7 +79,7 @@ class RealAuthRepository implements AuthRepository {
   @override
   Future<UserModel> verifyOtp(String emailOrPhone, String otp) async {
     // FIX: Backend expects 'code' for the OTP
-    final response = await apiClient.post('/auth/verify-otp', data: {
+    final response = await apiClient.post('auth/verify-otp', data: {
       'code': otp, 
     });
 
@@ -95,7 +95,7 @@ class RealAuthRepository implements AuthRepository {
   @override
   Future<UserModel?> getCurrentUser() async {
     try {
-      final response = await apiClient.get('/auth/me'); 
+      final response = await apiClient.get('auth/me'); 
       if (response.statusCode == 200 && response.data['success'] == true) {
         return UserModel.fromJson(response.data['data']);
       }
@@ -107,14 +107,14 @@ class RealAuthRepository implements AuthRepository {
 
   @override
   Future<void> sendOtp(String emailOrPhone) async {
-    await apiClient.post('/auth/send-otp', data: {
+    await apiClient.post('auth/send-otp', data: {
       'identity': emailOrPhone,
     });
   }
 
   @override
   Future<void> verifyDriverNIN(String nin) async {
-    final response = await apiClient.post('/auth/verify-nin', data: {'nin': nin});
+    final response = await apiClient.post('auth/verify-nin', data: {'nin': nin});
     if (response.data['success'] != true) {
       throw Exception(response.data['message'] ?? 'NIN Verification Failed');
     }
@@ -125,13 +125,13 @@ class RealAuthRepository implements AuthRepository {
     await _storage.delete(key: 'access_token');
     await _storage.delete(key: 'refresh_token');
     try {
-      await apiClient.post('/auth/logout');
+      await apiClient.post('auth/logout');
     } catch (_) {}
   }
 
   @override
   Future<List<dynamic>> getBanks() async {
-    final response = await apiClient.get('/auth/bank-list');
+    final response = await apiClient.get('auth/bank-list');
     if (response.data['success'] == true) {
       return response.data['data'];
     }
@@ -140,19 +140,19 @@ class RealAuthRepository implements AuthRepository {
 
   @override
   Future<void> requestWhatsAppOTP(String phoneNumber) async {
-    await apiClient.post('/auth/send-whatsapp-otp', data: {'phone': phoneNumber});
+    await apiClient.post('auth/send-whatsapp-otp', data: {'phone': phoneNumber});
   }
 
   @override
   Future<UserModel> updateProfile(UserModel user) async {
     // Use the model's toJson for consistent snake_case keys
-    final response = await apiClient.post('/auth/update-profile', data: user.toJson());
+    final response = await apiClient.post('auth/update-profile', data: user.toJson());
     return UserModel.fromJson(response.data['data']);
   }
 
   @override
   Future<Map<String, dynamic>?> verifyBankAccount(String bankCode, String accountNumber) async {
-    final response = await apiClient.post('/auth/verify-bank', data: {
+    final response = await apiClient.post('auth/verify-bank', data: {
       'accountNumber': accountNumber,
       'bankCode': bankCode,
     });

@@ -13,19 +13,19 @@ class RealTripRepository implements TripRepository {
 
   @override
   Future<List<TripModel>> getAvailableTrips() async {
-    final response = await apiClient.get('/rides/available');
+    final response = await apiClient.get('rides/available');
     return (response.data as List).map((e) => TripModel.fromJson(e)).toList();
   }
 
   @override
   Future<TripModel> initiateTrip(TripModel trip) async {
-    final response = await apiClient.post('/rides/request', data: trip.toJson());
+    final response = await apiClient.post('rides/request', data: trip.toJson());
     return TripModel.fromJson(response.data);
   }
 
   @override
   Future<TripModel> updateTripStatus(String tripId, RideStatus status) async {
-    final response = await apiClient.post('/rides/$tripId/status', data: {
+    final response = await apiClient.post('rides/$tripId/status', data: {
       'status': status.name.toUpperCase(),
     });
     return TripModel.fromJson(response.data);
@@ -44,13 +44,13 @@ class RealTripRepository implements TripRepository {
       'driver_id': driverId,
       'amount': bidAmount,
     };
-    final response = await apiClient.post('/rides/$tripId/bid', data: postData);
+    final response = await apiClient.post('rides/$tripId/bid', data: postData);
     return TripModel.fromJson(response.data as Map<String, dynamic>);
   }
 
   @override
   Future<TripModel> acceptBid(String tripId, String driverId, double amount) async {
-    final response = await apiClient.post('/rides/$tripId/accept', data: <String, dynamic>{
+    final response = await apiClient.post('rides/$tripId/accept', data: <String, dynamic>{
       'driver_id': driverId,
       'amount': amount,
     });
@@ -67,7 +67,7 @@ class RealTripRepository implements TripRepository {
   }) async {
     try {
       // 1. Ask Backend to initiate payment and generate txRef
-      final initResponse = await apiClient.post('/payments/initiate', data: <String, dynamic>{
+      final initResponse = await apiClient.post('payments/initiate', data: <String, dynamic>{
         'rideId': rideId,
         'payerType': payerType,
       });
@@ -99,7 +99,7 @@ class RealTripRepository implements TripRepository {
         print('Interswitch Transaction Ref: $iswTransactionRef');
 
         if (isSuccessful) {
-          final verifyResponse = await apiClient.post('/payments/verify', data: <String, dynamic>{
+          final verifyResponse = await apiClient.post('payments/verify', data: <String, dynamic>{
             'txRef': txRef,
             'iswRef': iswTransactionRef,
           });
@@ -120,12 +120,12 @@ class RealTripRepository implements TripRepository {
 
   @override
   Future<TripModel> getRideDetails(String rideId) async {
-    final response = await apiClient.get('/rides/$rideId');
+    final response = await apiClient.get('rides/$rideId');
     return TripModel.fromJson(response.data);
   }
 
   @override
   Future<void> joinRide(String rideId) async {
-    await apiClient.post('/rides/$rideId/join');
+    await apiClient.post('rides/$rideId/join');
   }
 }

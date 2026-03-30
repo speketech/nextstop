@@ -10,7 +10,8 @@ class ApiClient {
 
   // Always use the Render production URL — both in debug and release.
   // This is safe because the URL itself is not a secret.
-  static const String _productionUrl = 'https://nextstop-api-ua95.onrender.com/api';
+  // 1. ADDED TRAILING SLASH: Required by Dio to prevent stripping /api from the final URL
+  static const String _productionUrl = 'https://nextstop-api-ua95.onrender.com/api/';
 
   static BaseOptions _baseOptions() {
     // Sanitize the URL from .env: trim whitespace/newlines which cause DNS failures
@@ -68,6 +69,15 @@ class ApiClient {
             await _logoutUser();
             return handler.next(error);
           }
+        }
+
+        // ── 404: Endpoint not found ──────────────────────
+        if (error.response?.statusCode == 404) {
+          return handler.next(DioException(
+            requestOptions: error.requestOptions,
+            type: error.type,
+            message: 'Server configuration error (404). Please contact support.',
+          ));
         }
 
         // ── Network/DNS errors: wrap with friendly message ─
