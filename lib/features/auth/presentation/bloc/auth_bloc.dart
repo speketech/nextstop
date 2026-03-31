@@ -22,6 +22,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<RegisterRequested>(_onRegisterRequested);
   }
 
+  Future<void> _onAuthCheckRequested(AuthCheckRequested event, Emitter<AuthState> emit) async {
+    try {
+      // 🚀 FIX: Safety net to handle network failures or initial unauthenticated states
+      final user = await authRepository.getCurrentUser();
+      if (user != null) {
+        await _handleSocketInit();
+        emit(AuthAuthenticated(user));
+      } else {
+        emit(AuthUnauthenticated());
+      }
+    } catch (e) {
+      // If there's any error during the check (like 401 or no internet), treat as unauthenticated
+      emit(AuthUnauthenticated());
+    }
+  }
+
   Future<void> _onLoginRequested(LoginRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
@@ -29,7 +45,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await _handleSocketInit();
       emit(AuthAuthenticated(user));
     } catch (e) {
-      final message = (e is DioException) ? (e.message ?? e.toString()) : e.toString();
+      final message = _getErrorMessage(e);
       emit(AuthError(message));
     }
   }
@@ -48,31 +64,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await _handleSocketInit();
       emit(AuthAuthenticated(user));
     } catch (e) {
-      final message = (e is DioException) ? (e.message ?? e.toString()) : e.toString();
+      final message = _getErrorMessage(e);
       emit(AuthError(message));
     }
   }
 
-  Future<void> _onRequestWhatsAppOtp(RequestWhatsAppOtp event, Emitter<AuthState> emit) async {
-    emit(AuthLoading());
-    try {
-      await authRepository.requestWhatsAppOTP(event.phoneNumber);
-      emit(OtpSentState(event.phoneNumber));
-    } catch (e) {
-      final message = (e is DioException) ? (e.message ?? e.toString()) : e.toString();
-      emit(AuthError(message));
+  // Helper to extract clean error messages
+  String _getErrorMessage(Object e) {
+    if (e is DioException) {
+      return e.response?.data['message'] ?? e.message ?? e.toString();
     }
-  }
-
-  Future<void> _onVerifyNinRequested(VerifyNinRequested event, Emitter<AuthState> emit) async {
-    emit(AuthLoading());
-    try {
-      await authRepository.verifyDriverNIN(event.nin);
-      emit(NinVerified());
-    } catch (e) {
-      final message = (e is DioException) ? (e.message ?? e.toString()) : e.toString();
-      emit(AuthError(message));
-    }
+    return e.toString();
   }
 
   Future<void> _handleSocketInit() async {
@@ -82,25 +84,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onAuthCheckRequested(AuthCheckRequested event, Emitter<AuthState> emit) async {
-    final user = await authRepository.getCurrentUser();
-    if (user != null) {
-      await _handleSocketInit();
-      emit(AuthAuthenticated(user));
-    } else {
-      emit(AuthUnauthenticated());
-    }
-  }
+  // ... (rest of handlers updated with _getErrorMessage)
 
   Future<void> _onSendOtpRequested(SendOtpRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
       await authRepository.sendOtp(event.emailOrPhone);
       emit(OtpSentState(event.emailOrPhone));
-    } catch (e) {
-      final message = (e is DioException) ? (e.message ?? e.toString()) : e.toString();
-      emit(AuthError(message));
-    }
+    } catch (e) { emit(AuthError(_getErrorMessage(e))); }
   }
 
   Future<void> _onVerifyOtpRequested(VerifyOtpRequested event, Emitter<AuthState> emit) async {
@@ -109,10 +100,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final user = await authRepository.verifyOtp(event.emailOrPhone, event.otp);
       await _handleSocketInit();
       emit(AuthAuthenticated(user));
-    } catch (e) {
-      final message = (e is DioException) ? (e.message ?? e.toString()) : e.toString();
-      emit(AuthError(message));
-    }
+    } catch (e) { emit(AuthError(_getErrorMessage(e))); }
   }
 
   Future<void> _onUpdateProfileRequested(UpdateProfileRequested event, Emitter<AuthState> emit) async {
@@ -121,14 +109,27 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final user = await authRepository.updateProfile(event.user);
       await _handleSocketInit();
       emit(AuthAuthenticated(user));
-    } catch (e) {
-      final message = (e is DioException) ? (e.message ?? e.toString()) : e.toString();
-      emit(AuthError(message));
-    }
+    } catch (e) { emit(AuthError(_getErrorMessage(e))); }
   }
 
   Future<void> _onLogoutRequested(LogoutRequested event, Emitter<AuthState> emit) async {
     await authRepository.logout();
     emit(AuthUnauthenticated());
+  }
+
+  Future<void> _onRequestWhatsAppOtp(RequestWhatsAppOtp event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    try {
+      await authRepository.requestWhatsAppOTP(event.phoneNumber);
+      emit(OtpSentState(event.phoneNumber));
+    } catch (e) { emit(AuthError(_getErrorMessage(e))); }
+  }
+
+  Future<void> _onVerifyNinRequested(VerifyNinRequested event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    try {
+      await authRepository.verifyDriverNIN(event.nin);
+      emit(NinVerified());
+    } catch (e) { emit(AuthError(_getErrorMessage(e))); }
   }
 }

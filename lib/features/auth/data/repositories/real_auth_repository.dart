@@ -1,8 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../../../../core/api/auth_service.dart';
+import '../../../../core/api/api_client.dart';
 import '../../domain/models/user_model.dart';
 import '../../domain/repositories/auth_repository.dart';
-import '../../../../core/api/api_client.dart';
 
 class RealAuthRepository implements AuthRepository {
   final ApiClient apiClient;
@@ -30,8 +30,11 @@ class RealAuthRepository implements AuthRepository {
       await _storage.write(key: 'refresh_token', value: tokenData['refreshToken']);
 
       return UserModel(
-        id: tokenData['userId'], phone: phone, email: email, firstName: firstName, lastName: lastName,
-        
+        id: tokenData['userId'] ?? '', 
+        phone: phone, 
+        email: email, 
+        firstName: firstName, 
+        lastName: lastName,
         role: UserRole.values.firstWhere((e) => e.name == role.toLowerCase(), orElse: () => UserRole.passenger),
       );
     }
@@ -51,61 +54,65 @@ class RealAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<UserModel?> getCurrentUser() async {
+    try {
+      final response = await apiClient.get('auth/me');
+      if (response.data['success'] == true) {
+        return UserModel.fromJson(response.data['data']);
+      }
+      return null;
+    } on DioException catch (e) {
+      // 🚀 FIX: Handle 401 (Unauthorized) by returning null instead of crashing
+      if (e.response?.statusCode == 401) {
+        return null;
+      }
+      rethrow;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  @override
   Future<UserModel> verifyOtp(String emailOrPhone, String otp) async {
-    // UPDATED: Points to kyc/otp/verify
     final response = await apiClient.post('kyc/otp/verify', data: {'code': otp});
     if (response.data['success'] == true) {
       final user = await getCurrentUser();
-      if (user == null) throw Exception('User not found');
+      if (user == null) throw Exception('User not found after verification');
       return user;
     }
     throw Exception('Verification failed');
   }
 
   @override
-  Future<void> verifyDriverNIN(String nin) async {
-    // UPDATED: Points to kyc/verify-nin
-    await apiClient.post('kyc/verify-nin', data: {'nin': nin});
-  }
+  Future<void> verifyDriverNIN(String nin) async => await apiClient.post('kyc/verify-nin', data: {'nin': nin});
 
   @override
   Future<List<dynamic>> getBanks() async {
-    // UPDATED: Points to kyc/bank-list
     final response = await apiClient.get('kyc/bank-list');
     return response.data['data'];
   }
 
   @override
   Future<void> requestWhatsAppOTP(String phoneNumber) async {
-    // UPDATED: Points to kyc/otp/send
     await apiClient.post('kyc/otp/send', data: {'phone': phoneNumber, 'method': 'WHATSAPP'});
   }
 
   @override
   Future<Map<String, dynamic>?> verifyBankAccount(String bankCode, String accountNumber) async {
-    // UPDATED: Points to kyc/verify-bank
-    final response = await apiClient.post('kyc/verify-bank', data: {
-      'accountNumber': accountNumber, 'bankCode': bankCode,
-    });
+    final response = await apiClient.post('kyc/verify-bank', data: {'accountNumber': accountNumber, 'bankCode': bankCode});
     return response.data['success'] == true ? response.data : null;
   }
 
   @override
-  Future<UserModel?> getCurrentUser() async {
-    final response = await apiClient.get('auth/me');
-    return response.data['success'] == true ? UserModel.fromJson(response.data['data']) : null;
-  }
-
-  @override
   Future<void> logout() async {
+    try {
+      await apiClient.post('auth/logout');
+    } catch (_) {} // Ignore logout network errors
     await _storage.deleteAll();
-    await apiClient.post('auth/logout');
   }
   
   @override
-  Future<void> sendOtp(String emailOrPhone) async {
-    await apiClient.post('kyc/otp/send', data: {'phone': emailOrPhone, 'method': 'SMS'});
-  }
+  Future<void> sendOtp(String emailOrPhone) async => await apiClient.post('kyc/otp/send', data: {'phone': emailOrPhone, 'method': 'SMS'});
 
   @override
   Future<UserModel> updateProfile(UserModel user) async {

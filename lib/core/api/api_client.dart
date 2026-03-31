@@ -11,9 +11,12 @@ class ApiClient {
   static BaseOptions _baseOptions() {
     String apiUrl = _productionUrl.trim();
     
-    // Normalizes to .../api/ to prevent 404
+    // Normalizes to ensure it ends with /api
+    if (apiUrl.endsWith('/')) {
+      apiUrl = apiUrl.substring(0, apiUrl.length - 1);
+    }
+    
     if (!apiUrl.endsWith('/api')) {
-      if (apiUrl.endsWith('/')) apiUrl = apiUrl.substring(0, apiUrl.length - 1);
       apiUrl = '$apiUrl/api';
     }
 
@@ -22,17 +25,30 @@ class ApiClient {
     return BaseOptions(
       baseUrl: '$apiUrl/', 
       connectTimeout: const Duration(seconds: 60),
-      headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+      receiveTimeout: const Duration(seconds: 60),
+      headers: {
+        'Content-Type': 'application/json', 
+        'Accept': 'application/json'
+      },
     );
   }
 
   ApiClient() {
     _dio = Dio(_baseOptions());
+    
+    // Interceptor to inject JWT token into every request
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
         final token = await _storage.read(key: 'access_token');
-        if (token != null) options.headers['Authorization'] = 'Bearer $token';
+        if (token != null) {
+          options.headers['Authorization'] = 'Bearer $token';
+        }
         return handler.next(options);
+      },
+      onError: (DioException e, handler) {
+        // Log errors for debugging
+        debugPrint('API Error: ${e.response?.statusCode} - ${e.message}');
+        return handler.next(e);
       },
     ));
   }
